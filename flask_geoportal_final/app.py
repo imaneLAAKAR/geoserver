@@ -120,6 +120,10 @@ with get_db() as db:
     safe_add_column(db, "users", "No_projet INTEGER")
 
 
+
+@app.route('/')
+def home():
+    return render_template('index.html')
 # --------- ADMIN AUTH ---------
 @app.route("/admin_login", methods=["GET", "POST"])
 def admin_login():
