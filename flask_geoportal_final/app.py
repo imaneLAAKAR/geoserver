@@ -413,6 +413,13 @@ def admin_profile():
         message = "Modification prise en compte (redémarrage de l'app requis pour voir les changements en dur)" 
     return render_template("admin_profile.html", admin_login=ADMIN_LOGIN, message=message)
 
+@app.route("/user")
+def user():
+    if "username" not in session:
+        return redirect(url_for("login"))
+    return render_template("user.html")
+
+
 
 if __name__ == "__main__":
     app.run(debug=True, port=5000, host="0.0.0.0")
