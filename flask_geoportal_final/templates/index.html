@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Bienvenue {{ username }}</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: sans-serif;
+      display: flex;
+      flex-direction: column;
+      background: #e3eefd;
+    }
+
+    .admin-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: url('/static/monfond.png') center/cover no-repeat;
+      padding: 0 30px;
+      height: 100px;
+      border-radius: 0 0 20px 20px;
+      color: #fff;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+    }
+
+    .societe-logo {
+      height: 70px;
+      margin-right: 16px;
+      border-radius: 10px;
+    }
+
+    .societe-infos {
+      line-height: 1.4;
+    }
+
+    .header-right button {
+      background: #4078c6;
+      border: none;
+      border-radius: 20px;
+      padding: 10px 16px;
+      color: #fff;
+      cursor: pointer;
+    }
+
+    .main-content {
+      display: flex;
+      height: calc(100vh - 100px);
+    }
+
+    .sidebar {
+      width: 300px;
+      background: #f4f6fb;
+      padding: 15px;
+      overflow-y: auto;
+      border-right: 2px solid #d0d8e4;
+    }
+
+    .panel {
+      margin-bottom: 25px;
+      background: white;
+      border-radius: 10px;
+      padding: 10px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .panel h4 {
+      margin-top: 0;
+      color: #2c5a87;
+    }
+
+    .layer-item, .file-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+
+    .layer-item input[type="checkbox"] {
+      margin-right: 10px;
+    }
+
+    .actions {
+      display: flex;
+      gap: 5px;
+    }
+
+    .actions a, .actions button {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 1.1em;
+    }
+
+    .actions img {
+      height: 18px;
+    }
+
+    .feedback-form {
+      display: none;
+      margin-top: 5px;
+    }
+
+    .feedback-form textarea {
+      width: 100%;
+      resize: vertical;
+    }
+
+    #map {
+      flex: 1;
+    }
+  </style>
+</head>
+<body>
+  <div class="admin-header">
+    <div class="header-left">
+      <img src="/static/admin-logo.png" alt="Logo société" class="societe-logo">
+      <div class="societe-infos">
+        <strong>XY Concept</strong><br>
+        xy@xyconcept.ma | +212 537-741-765<br>
+        Avenue Tarik Ibn Ziad, Rés Al Osra, Témara / Maroc
+      </div>
+    </div>
+    <div class="header-right">
+      <button onclick="window.location.href='{{ url_for('logout') }}'">
+        <img src="/static/logout.png" alt="logout" height="20">
+      </button>
+    </div>
+  </div>
+
+  <div class="main-content">
+    <div class="sidebar">
+      <div class="panel">
+        <h4>Couches partagées</h4>
+        <div id="layer-list">
+          {% for layer, can_download in user_layers %}
+            <div class="layer-item" draggable="true" data-index="{{ loop.index0 }}">
+              <div>
+                <input type="checkbox" onchange="toggleLayer('{{ layer }}', this.checked)"> {{ layer.split(':')[1] }}
+              </div>
+              <div class="actions">
+                <button onclick="zoomToLayer({{ loop.index0 }})" title="Zoomer">
+                  <img src="/static/zoom.png" alt="Zoom">
+                </button>
+                <button onclick="toggleFeedbackForm(this)" title="Avis">
+                  <img src="/static/avis.png" alt="Avis">
+                </button>
+                {% if can_download %}
+                  <a href="http://localhost:8080/geoserver/PFE/ows?service=WFS&version=1.0.0&request=GetFeature&typeName={{ layer }}&outputFormat=SHAPE-ZIP" target="_blank" title="Télécharger">
+                    <img src="/static/telecharger.png" alt="Télécharger">
+                  </a>
+                {% else %}
+                  <span title="Non autorisé">❌</span>
+                {% endif %}
+              </div>
+            </div>
+            <form method="post" action="{{ url_for('layer_feedback', layer_name=layer) }}" class="feedback-form">
+              <textarea name="comment" placeholder="Votre avis..." required></textarea>
+              <button type="submit">Envoyer</button>
+            </form>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="panel">
+        <h4>Fichiers partagés</h4>
+        {% for url, label, can_download in docs %}
+          <div class="file-item">
+            <span>{{ label }}</span>
+            <div class="actions">
+              <a href="{{ url_for('view_file', filename=label) }}" target="_blank" title="Voir">
+                <img src="/static/visualiser.png" alt="Voir">
+              </a>
+              <button onclick="toggleFeedbackForm(this)" title="Avis">
+                <img src="/static/avis.png" alt="Avis">
+              </button>
+              {% if can_download %}
+                <a href="{{ url_for('download_file', filename=label) }}" title="Télécharger">
+                  <img src="/static/telecharger.png" alt="Télécharger">
+                </a>
+              {% else %}
+                <span title="Non autorisé">❌</span>
+              {% endif %}
+            </div>
+          </div>
+          <form method="post" action="{{ url_for('feedback', doc_url=url) }}" class="feedback-form">
+            <textarea name="comment" placeholder="Votre avis ici..." required></textarea>
+            <button type="submit">Envoyer</button>
+          </form>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div id="map"></div>
+  </div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script>
+    const map = L.map('map').setView([33.57, -7.62], 10);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+    const overlays = {};
+    const user_layers = {{ user_layers|tojson }};
+    const layer_bboxes = {{ layer_bboxes|tojson }};
+
+    function toggleLayer(layerName, show) {
+      const [ws, name] = layerName.split(":");
+      const url = `http://localhost:8080/geoserver/${ws}/wms`;
+
+      if (show) {
+        overlays[layerName] = L.tileLayer.wms(url, {
+          layers: `${ws}:${name}`,
+          format: 'image/png',
+          transparent: true
+        }).addTo(map);
+      } else {
+        if (overlays[layerName]) {
+          map.removeLayer(overlays[layerName]);
+        }
+      }
+    }
+
+    function zoomToLayer(index) {
+      const bbox = layer_bboxes[index];
+      if (bbox) {
+        map.fitBounds(bbox);
+      }
+    }
+
+    function toggleFeedbackForm(button) {
+      const form = button.closest('.layer-item, .file-item').nextElementSibling;
+      if (form && form.classList.contains('feedback-form')) {
+        form.style.display = form.style.display === 'block' ? 'none' : 'block';
+      }
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,164 @@
+{% extends "admin.html" %}
+
+{% block title %}Avis des utilisateurs{% endblock %}
+
+{% block content %}
+<style>
+  /* Styles pour en-tête gris anthracite */
+  #filesTable thead th,
+  #layersTable thead th {
+    background-color: #d6d8db !important;
+    color: #010101 !important;
+  }
+  /* Suppression alternance : fond blanc uniforme */
+  #filesTable tbody tr,
+  #layersTable tbody tr {
+    background-color: white !important;
+    transition: background-color 0.3s ease;
+  }
+  /* Effet survol */
+  #filesTable tbody tr:hover,
+  #layersTable tbody tr:hover {
+    background-color: #e9ecef !important;
+  }
+  /* Bouton supprimer gris anthracite */
+  .btn-danger {
+    background-color: #e83108 !important;
+    border-color: #dadcde !important;
+    color: #f8f9fa !important;
+  }
+  .btn-danger:hover {
+    background-color: #495057 !important;
+    border-color: #495057 !important;
+  }
+</style>
+
+<div class="container py-5">
+
+  <!-- Recherche globale -->
+  <div class="mb-4">
+    <input type="text" id="searchInput" class="form-control" placeholder="Rechercher dans les avis (utilisateur, fichier, couche, commentaire)" onkeyup="filterTables()" />
+  </div>
+
+  <h2 class="mb-4">Avis sur les fichiers</h2>
+ <table class="table table-bordered bg-white" id="filesTable">
+
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Utilisateur</th>
+        <th>Fichier</th>
+        <th>Commentaire</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for f in feedbacks %}
+      <tr>
+        <td>{{ f['date'] }}</td>
+        <td>{{ f['username'] }}</td>
+        <td>{{ f['document'] or '' }}</td>
+        <td>{{ f['comment'] }}</td>
+        <td>
+          <form method="post" action="{{ url_for('admin_delete_feedback', feedback_id=f['id']) }}" onsubmit="return confirm('Confirmer la suppression ?');">
+            <button type="submit" class="btn btn-sm btn-danger">Supprimer</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <nav>
+    <ul class="pagination justify-content-center" id="filesPagination"></ul>
+  </nav>
+
+  <h2 class="mt-5 mb-4">Avis sur les couches</h2>
+ <table class="table table-bordered bg-white" id="layersTable">
+
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Utilisateur</th>
+        <th>Couche</th>
+        <th>Commentaire</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for lf in layer_feedbacks %}
+      <tr>
+        <td>{{ lf['date'] }}</td>
+        <td>{{ lf['username'] }}</td>
+        <td>{{ lf['layer_name'].replace('PFE:', '') }}</td>
+        <td>{{ lf['comment'] }}</td>
+        <td>
+          <form method="post" action="{{ url_for('admin_delete_layer_feedback', feedback_id=lf['id']) }}" onsubmit="return confirm('Confirmer la suppression ?');">
+            <button type="submit" class="btn btn-sm btn-danger">Supprimer</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <nav>
+    <ul class="pagination justify-content-center" id="layersPagination"></ul>
+  </nav>
+</div>
+
+<script>
+  const rowsPerPage = 10;
+
+  function paginateTable(tableId, paginationId) {
+    const table = document.getElementById(tableId);
+    const pagination = document.getElementById(paginationId);
+    const rows = Array.from(table.tBodies[0].rows);
+    const pageCount = Math.ceil(rows.length / rowsPerPage);
+    let currentPage = 1;
+
+    function showPage(page) {
+      currentPage = page;
+      let start = (page - 1) * rowsPerPage;
+      let end = start + rowsPerPage;
+
+      rows.forEach((row, i) => {
+        row.style.display = (i >= start && i < end) ? '' : 'none';
+      });
+
+      // Generate pagination buttons
+      pagination.innerHTML = '';
+      for (let i = 1; i <= pageCount; i++) {
+        let li = document.createElement('li');
+        li.className = 'page-item' + (i === page ? ' active' : '');
+        li.innerHTML = `<a href="#" class="page-link">${i}</a>`;
+        li.onclick = function(e) {
+          e.preventDefault();
+          showPage(i);
+        };
+        pagination.appendChild(li);
+      }
+    }
+    showPage(1);
+  }
+
+  function filterTables() {
+    const input = document.getElementById('searchInput');
+    const filter = input.value.toLowerCase();
+
+    ['filesTable', 'layersTable'].forEach(tableId => {
+      const table = document.getElementById(tableId);
+      Array.from(table.tBodies[0].rows).forEach(row => {
+        const text = row.textContent.toLowerCase();
+        row.style.display = text.includes(filter) ? '' : 'none';
+      });
+    });
+  }
+
+  window.onload = function() {
+    paginateTable('filesTable', 'filesPagination');
+    paginateTable('layersTable', 'layersPagination');
+  };
+</script>
+
+{% endblock %}

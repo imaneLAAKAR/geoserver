@@ -1,0 +1,23 @@
+Modèle : Random Forest
+Accuracy : 0.8283
+
+=== Classification Report ===
+              precision    recall  f1-score   support
+
+           1      0.750     0.375     0.500         8
+           2      0.825     0.881     0.852        59
+           3      0.886     0.765     0.821        51
+           4      0.750     0.667     0.706        27
+           5      0.825     0.981     0.897        53
+
+    accuracy                          0.828       198
+   macro avg      0.807     0.734     0.755       198
+weighted avg      0.828     0.828     0.822       198
+
+=== Matrice de confusion ===
+Classes (ordre): 1, 2, 3, 4, 5
+[[ 3  0  2  0  3]
+ [ 0 52  1  6  0]
+ [ 1  4 39  0  7]
+ [ 0  7  1 18  1]
+ [ 0  0  1  0 52]]

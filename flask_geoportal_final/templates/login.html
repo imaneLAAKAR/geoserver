@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Connexion Utilisateur</title>
+  <link href="https://fonts.googleapis.com/css?family=Quicksand:700,400&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: url('/static/monfond.png') center/cover no-repeat;
+      font-family: 'Quicksand', Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .glass-card {
+      background: rgba(255,255,255,0.22);
+      border-radius: 32px;
+      box-shadow: 0 4px 48px 4px rgba(90,138,177,0.15);
+      padding: 44px 38px 34px 38px;
+      backdrop-filter: blur(10px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-width: 360px;
+      max-width: 95vw;
+      border: 1.5px solid rgba(255,255,255,0.18);
+    }
+    .logo-circle {
+      width: 100px;
+      height: 100px;
+      background: #fff;
+      border-radius: 50%;
+      margin-bottom: 22px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      box-shadow: 0 2px 12px rgba(90,138,177,0.10);
+    }
+    .logo-circle img {
+      width: 70px; height: 70px; object-fit: contain;
+    }
+    h2 {
+      font-size: 2em;
+      letter-spacing: 1px;
+      margin-bottom: 1.7em;
+      color: #21465a;
+      font-weight: 700;
+    }
+    .form-group {
+      width: 100%;
+      margin-bottom: 1.2em;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    label {
+      font-size: 1.1em;
+      margin-bottom: 0.3em;
+      font-weight: bold;
+      color: #23698b;
+    }
+    input[type="text"], input[type="password"] {
+      width: 100%;
+      font-size: 1.07em;
+      padding: 11px 15px;
+      border: 1.6px solid #72acc9;
+      border-radius: 8px;
+      outline: none;
+      margin-bottom: 0.2em;
+      background: #f7fbfd;
+      transition: border-color 0.2s;
+    }
+    input:focus {
+      border-color: #2483b7;
+    }
+    .btn-login {
+      width: 100%;
+      padding: 13px 0;
+      border: none;
+      border-radius: 14px;
+      background: linear-gradient(120deg, #21b8d8, #257ca6);
+      color: #fff;
+      font-size: 1.1em;
+      font-weight: bold;
+      letter-spacing: 1px;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(80,125,178,0.09);
+      transition: background 0.18s;
+    }
+    .btn-login:hover {
+      background: linear-gradient(120deg, #1090b3, #155d7c);
+    }
+    .error {
+      color: #c52d1c;
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 1em;
+      font-size: 1.1em;
+    }
+    .user-tip {
+      font-size: 0.97em;
+      color: #338da2;
+      text-align: center;
+      margin-bottom: 1em;
+      margin-top: 0.6em;
+    }
+    @media (max-width: 600px) {
+      .glass-card { min-width: 90vw; padding: 22px 4vw 16px 4vw; }
+      h2 { font-size: 1.18em; }
+    }
+  </style>
+</head>
+<body>
+  <div class="glass-card">
+    <div class="logo-circle">
+      <img src="/static/admin-logo.png" alt="Logo Utilisateur">
+    </div>
+    <h2>Espace Utilisateur</h2>
+    {% if error %}
+      <div class="error">{{ error }}</div>
+    {% endif %}
+    <form method="post">
+      <div class="form-group">
+        <label>Identifiant :</label>
+        <input type="text" name="username" required>
+      </div>
+      <div class="form-group">
+        <label>Mot de passe :</label>
+        <input type="password" name="password" required>
+      </div>
+      <button class="btn-login" type="submit">Connexion</button>
+    </form>
+    <div class="user-tip">
+      Veuillez vous authentifier pour accéder à vos données
+    </div>
+  </div>
+</body>
+</html>

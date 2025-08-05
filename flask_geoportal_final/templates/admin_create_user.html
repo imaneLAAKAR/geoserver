@@ -1,0 +1,35 @@
+{% extends "admin.html" %}
+
+{% block content %}
+<div class="d-flex flex-column align-items-center py-4" style="min-height: 80vh;">
+  <h2 class="mb-4 text-center" style="font-weight:700;">Informations d’utilisateur</h2>
+  <form method="post" enctype="multipart/form-data" style="width: 100%; max-width: 520px; background: #fff; padding: 35px 28px 25px 28px; border-radius: 30px; box-shadow: 0 4px 18px rgba(110,140,220,0.10);">
+    {% if message %}
+      <div class="alert alert-success text-center">{{ message }}</div>
+    {% endif %}
+    <div class="mb-3">
+      <label class="form-label">Nom d'utilisateur :</label>
+      <input type="text" class="form-control" name="username" required>
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Mot de passe :</label>
+      <input type="password" class="form-control" name="password" required>
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Nom de la société cible :</label>
+      <input type="text" class="form-control" name="societe" required>
+    </div>
+    <div class="mb-3">
+      <label class="form-label">N° projet :</label>
+      <input type="text" class="form-control" name="No_projet" required>
+    </div>
+    <div class="mb-3">
+  <label class="form-label">Email :</label>
+  <input type="email" class="form-control" name="email" required>
+</div>
+    <div class="text-center mt-3">
+      <button type="submit" class="btn btn-primary px-5">Créer</button>
+    </div>
+  </form>
+</div>
+{% endblock %}

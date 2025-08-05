@@ -1,0 +1,167 @@
+{% extends "admin.html" %}
+{% block content %}
+
+{% if message %}
+  <div class="alert alert-success text-center">{{ message }}</div>
+{% endif %}
+
+<style>
+  .edit-container {
+    background: #fff;
+    border-radius: 56px;
+    box-shadow: 0 4px 40px #b3b9c4a8;
+    padding: 45px 46px 30px 46px;
+    max-width: 870px;
+    margin: 50px auto 0 auto;
+  }
+  .edit-title {
+    font-size: 2.1em;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 38px;
+    color: #283759;
+  }
+  .edit-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 22px;
+    gap: 16px;
+  }
+  .edit-label {
+    width: 220px;
+    text-align: right;
+    margin-right: 18px;
+    font-size: 1.14em;
+    font-weight: 600;
+    color: #222;
+  }
+  .edit-form .form-control {
+    border-radius: 16px;
+    border: 2px solid #bbb;
+    font-size: 1.13em;
+    background: #f8fbff;
+  }
+  select[multiple] {
+    min-height: 90px;
+    background: #f6f8fc;
+    border-radius: 15px;
+    border: 2px solid #bbb;
+    width: 100%;
+    font-size: 1.12em;
+    padding: 7px 11px;
+  }
+  .edit-checkbox {
+    width: 23px;
+    height: 23px;
+    accent-color: #4078c6;
+    border-radius: 6px;
+    border: none;
+    margin-left: 7px;
+    vertical-align: middle;
+  }
+  .edit-btn {
+    width: 60%;
+    margin: 35px auto 0 auto;
+    display: block;
+    background: #4078c6;
+    border-radius: 18px;
+    padding: 12px 0;
+    color: #fff;
+    font-size: 1.26em;
+    font-weight: 600;
+    border: none;
+    transition: background .18s;
+  }
+  .edit-btn:hover { background: #285ca0; }
+  .already-files {
+    margin: 0 0 0 240px;
+    padding: 0;
+    list-style: none;
+  }
+  .already-files li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 6px 0 6px 0;
+  }
+  .delete-btn {
+    background: #c0392b;
+    color: #fff;
+    border: none;
+    border-radius: 9px;
+    font-size: 1.05em;
+    padding: 4px 11px;
+    margin-left: 8px;
+    cursor: pointer;
+    transition: background .16s;
+  }
+  .delete-btn:hover { background: #9a2516; }
+</style>
+
+<div class="edit-container">
+  <div class="edit-title">
+    Utilisateur : <span style="font-weight:400">{{ user.username }}</span>
+  </div>
+  <form method="post" enctype="multipart/form-data" class="edit-form">
+    <!-- Identifiant (readonly) -->
+    <div class="edit-row">
+      <div class="edit-label">Identifiant :</div>
+      <input class="form-control" name="username" type="text" value="{{ user.username }}" readonly>
+    </div>
+    <!-- Mot de passe -->
+    <div class="edit-row">
+      <div class="edit-label">Mot de passe :</div>
+      <input class="form-control" name="password" type="password" placeholder="Nouveau mot de passe...">
+    </div>
+    <!-- Email -->
+ <div class="edit-row">
+  <div class="edit-label">Email :</div>
+  <input class="form-control" name="email" type="email" value="{{ user.email }}" required>
+ </div>
+
+    <!-- Multi-select des couches -->
+    <div class="edit-row">
+      <div class="edit-label">Couches partagées :</div>
+      <select name="layers_selected" multiple >
+        {% for layer in layers_available %}
+          <option value="{{ layer }}" {% if layer in layers_user %}selected{% endif %}>{{ layer }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <!-- Cases téléchargement pour les couches sélectionnées -->
+    {% for layer in layers_available %}
+      {% if layer in layers_user %}
+      <div class="edit-row" style="margin-bottom: 7px;">
+        <div class="edit-label"></div>
+        <span style="flex:1;">Téléchargement pour <b>{{ layer }}</b> :</span>
+        <input type="checkbox" class="edit-checkbox"
+               name="dl_{{ layer }}" {% if dl_rights.get(layer) %}checked{% endif %}>
+      </div>
+      {% endif %}
+    {% endfor %}
+    <!-- Upload fichiers partagés (multi) -->
+    <div class="edit-row" style="align-items: flex-start;">
+      <div class="edit-label">Fichiers partagés :</div>
+      <input type="file" name="shared_files" multiple class="form-control" style="padding:7px 9px;">
+    </div>
+    <!-- Liste des fichiers déjà partagés avec droit de téléchargement + suppression -->
+    {% if docs_user %}
+    <ul class="already-files">
+      {% for doc in docs_user %}
+      <li>
+        <span>{{ doc.label }}</span>
+        <input type="checkbox" class="edit-checkbox"
+               name="dl_file_{{ doc.label }}" {% if doc.can_download %}checked{% endif %}>
+        <span style="font-size:0.98em; color:#447;opacity:0.8;">Téléchargement</span>
+        <button name="delete_doc" value="{{ doc.id }}" class="delete-btn"
+                onclick="return confirm('Supprimer ce fichier ?');" type="submit">
+          Supprimer
+        </button>
+      </li>
+      {% endfor %}
+    </ul>
+    {% endif %}
+    <button type="submit" class="edit-btn">Enregistrer</button>
+  </form>
+</div>
+{% endblock %}
