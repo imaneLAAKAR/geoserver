@@ -13,9 +13,6 @@ ADMIN_PASSWORD = "admin123"
 UPLOAD_FOLDER = os.path.join(os.getcwd(), "uploads")
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
-@app.route('/')
-def home():
-    return "<h1>Bienvenue sur mon GeoWeb </h1>"
 
 GEOSERVER_REST_URL = "http://localhost:8080/geoserver/rest"
 GEOSERVER_WORKSPACE = "PFE"
