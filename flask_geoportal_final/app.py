@@ -13,6 +13,10 @@ ADMIN_PASSWORD = "admin123"
 UPLOAD_FOLDER = os.path.join(os.getcwd(), "uploads")
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
+@app.route('/')
+def home():
+    return "<h1>Bienvenue sur mon GeoWeb </h1>"
+
 GEOSERVER_REST_URL = "http://localhost:8080/geoserver/rest"
 GEOSERVER_WORKSPACE = "PFE"
 GEOSERVER_USER = "admin"
@@ -119,11 +123,6 @@ with get_db() as db:
     safe_add_column(db, "users", "societe TEXT")
     safe_add_column(db, "users", "No_projet INTEGER")
 
-
-
-@app.route('/')
-def home():
-    return render_template('index.html')
 # --------- ADMIN AUTH ---------
 @app.route("/admin_login", methods=["GET", "POST"])
 def admin_login():
